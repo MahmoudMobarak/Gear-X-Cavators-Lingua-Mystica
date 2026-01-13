@@ -199,10 +199,9 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
   translationCard.textContent = "Translating...";
   explanationCard.textContent = "Translating...";
 
-  const noMeaning = NO_MEANING_TEXT[translationLanguage] || "No clear meaning";
-
   try {
-        const res = await fetch("/translate", {
+    // Call your backend now
+    const res = await fetch("/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -211,23 +210,14 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
         toLang: translationLanguage
       })
     });
-    
+
     const data = await res.json();
-    const result = data.result;
-    
+    const result = data.result || "No clear meaning";
+
     // Split into translation + explanation
     const lines = result.split("\n").filter(l => l.trim());
     translationCard.textContent = lines[0] || "No clear meaning";
     explanationCard.textContent = lines.slice(1).join("\n") || "No clear meaning";
-    });
-
-    const data = await res.json();
-    const result = data.choices[0].message.content;
-
-    // Split into translation + explanation
-    const lines = result.split("\n").filter(l => l.trim());
-    translationCard.textContent = lines[0] || noMeaning;
-    explanationCard.textContent = lines.slice(1).join("\n") || noMeaning;
 
   } catch (err) {
     console.error(err);
@@ -235,4 +225,5 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
