@@ -1,29 +1,23 @@
 // server.js
 const express = require("express");
 const path = require("path");
-const fetch = require("node-fetch"); // for making API calls
+const fetch = require("node-fetch");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json()); // for JSON body parsing
-
-// Serve frontend
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
-});
+app.use(express.json());
 
 // Translation endpoint
 app.post("/translate", async (req, res) => {
   const { input, fromLang, toLang } = req.body;
-
-  if (!input || !fromLang || !toLang) {
-    return res.status(400).json({ error: "Missing input or languages" });
-  }
+  if (!input || !fromLang || !toLang) return res.status(400).json({ error: "Missing input or languages" });
 
   try {
+    const noMeaning = "No clear meaning";
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -38,7 +32,8 @@ app.post("/translate", async (req, res) => {
             content: `Translate from ${fromLang} to ${toLang}.
                       Give ONLY the plain translation in the first line.
                       Then give a clear explanation in plain text.
-                      Do NOT include markdown or special formatting.`
+                      Do NOT include markdown or special formatting.
+                      If the word does not exist, say '${noMeaning}'.`
           },
           { role: "user", content: input }
         ]
@@ -46,7 +41,7 @@ app.post("/translate", async (req, res) => {
     });
 
     const data = await response.json();
-    const result = data.choices[0]?.message?.content || "No result";
+    const result = data.choices[0]?.message?.content || noMeaning;
 
     res.json({ result });
   } catch (err) {
