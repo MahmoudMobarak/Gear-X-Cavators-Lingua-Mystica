@@ -1,7 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
-import bodyParser from "body-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -10,32 +9,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ------------------------------
-   Fix __dirname for ES modules
------------------------------- */
+// Needed for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ------------------------------
-   Middleware
------------------------------- */
-app.use(bodyParser.json());
-app.use(express.static(__dirname));
+// Middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-/* ------------------------------
-   TRANSLATE ENDPOINT
------------------------------- */
+// TRANSLATE ENDPOINT
 app.post("/translate", async (req, res) => {
   const { input, fromLang, toLang } = req.body;
 
   if (!input || !fromLang || !toLang) {
-    return res.json({
-      result: "No clear meaning\nNo clear meaning"
-    });
+    return res.json({ result: "No clear meaning" });
   }
 
   try {
-    const aiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,51 +37,28 @@ app.post("/translate", async (req, res) => {
         messages: [
           {
             role: "system",
-            content:
-              `Translate from ${fromLang} to ${toLang}.
-Give ONLY the translation on the first line.
-Then give a plain-text explanation.
-Do NOT use markdown, symbols, bullets, or formatting.
+            content: `Translate from ${fromLang} to ${toLang}.
+Give ONLY the plain translation in the first line.
+Then give a clear explanation in plain text.
 If no meaning exists, say "No clear meaning".`
           },
-          {
-            role: "user",
-            content: input
-          }
+          { role: "user", content: input }
         ]
       })
     });
 
-    const data = await aiRes.json();
-
-    if (!data.choices || !data.choices[0]) {
-      return res.json({
-        result: "No clear meaning\nNo clear meaning"
-      });
-    }
-
-    const text = data.choices[0].message.content.trim();
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || "No clear meaning";
 
     res.json({ result: text });
 
   } catch (err) {
-    console.error("AI ERROR:", err);
-    res.json({
-      result: "Translation failed\nTranslation failed"
-    });
+    console.error(err);
+    res.json({ result: "No clear meaning" });
   }
 });
 
-/* ------------------------------
-   Serve frontend
------------------------------- */
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-/* ------------------------------
-   Start server
------------------------------- */
+// START SERVER
 app.listen(PORT, () => {
   console.log(`Lingua Mystica running on port ${PORT}`);
 });
