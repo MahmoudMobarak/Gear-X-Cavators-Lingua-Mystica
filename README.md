@@ -1,6 +1,4 @@
 # -Lingua-Mystica-Lingua-Mystica-Ancient-Script-Decoder
-Absolutely! Here’s a **professional README** and a concise **project description** for **Lingua Mystica** that you can use for GitHub, documentation, or FLL submission.
-
 ---
 
 ## **Project Name:** Lingua Mystica
@@ -80,8 +78,4 @@ Lingua Mystica provides historical context, script examples, and translations, b
 **Prototype / Educational Tool / Archaeological Research Aid**
 
 ---
-
-If you want, I can also write a **short, catchy one-paragraph version** for presentations or posters, perfect for FLL judges and display boards.
-
-Do you want me to do that too?
 
