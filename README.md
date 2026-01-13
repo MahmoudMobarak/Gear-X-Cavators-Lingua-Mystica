@@ -1,4 +1,4 @@
-# -Lingua-Mystica-Lingua-Mystica-Ancient-Script-Decoder
+# Gear-X-Cavators-Lingua-Mystica-Ancient-Script-Decoder
 ---
 
 ## **Project Name:** Lingua Mystica
