@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ancient Script Decoder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <span class="icon">📜</span>
+    <div>
+      <h1>Lingua Mystica-Ancient Script Decoder</h1>
+      <p>Unlock the wisdom of lost civilizations</p>
+    </div>
+  </div>
+
+  <!-- LANGUAGE INFO BUTTON -->
+  <button id="infoBtn" class="lang-btn">
+    Select a Language
+  </button>
+</header>
+
+<!-- LANGUAGE INFO PANEL -->
+<div id="infoPanel" class="info-panel hidden">
+  <h2 id="infoTitle"></h2>
+
+  <div class="info-block">
+    <strong>Script / Alphabet</strong>
+    <p id="infoScript"></p>
+  </div>
+
+  <div class="info-block">
+    <strong>Characters</strong>
+    <p id="infoChars" class="mono"></p>
+  </div>
+
+  <div class="info-block">
+    <strong>History</strong>
+    <p id="infoHistory"></p>
+  </div>
+
+  <div class="info-block">
+    <strong>Example Words</strong>
+    <ul id="infoExamples"></ul>
+  </div>
+</div>
+
+<main class="container">
+
+<h2 class="section-title">✨ Select Ancient Language</h2>
+
+<div class="grid">
+  <div class="card source brown" data-lang="Sanskrit">
+    <div class="native big">संस्कृतम्</div>
+    <div class="english">Sanskrit</div>
+    <div class="meta">Devanagari</div>
+    <div class="meta">1500 BCE – Present • India</div>
+  </div>
+
+  <div class="card source green" data-lang="Sumerian">
+    <div class="native big">𒀭𒂗𒆠</div>
+    <div class="english">Sumerian</div>
+    <div class="meta">Cuneiform</div>
+    <div class="meta">4000–2000 BCE • Mesopotamia</div>
+  </div>
+
+  <div class="card source gold" data-lang="Egyptian">
+    <div class="native big">𓂀𓊹</div>
+    <div class="english">Egyptian</div>
+    <div class="meta">Hieroglyphic</div>
+    <div class="meta">3200–400 BCE • Egypt</div>
+  </div>
+
+  <div class="card source red" data-lang="Akkadian">
+    <div class="native big">𒀝𒅗𒁺</div>
+    <div class="english">Akkadian</div>
+    <div class="meta">Cuneiform</div>
+    <div class="meta">2500–100 BCE • Mesopotamia</div>
+  </div>
+
+  <div class="card source blue" data-lang="Ancient Greek">
+    <div class="native big">Ελληνική</div>
+    <div class="english">Ancient Greek</div>
+    <div class="meta">Greek Alphabet</div>
+    <div class="meta">800–600 BCE • Mediterranean</div>
+  </div>
+
+  <div class="card source purple" data-lang="Latin">
+    <div class="native big">LINGVA LATINA</div>
+    <div class="english">Latin</div>
+    <div class="meta">Latin Alphabet</div>
+    <div class="meta">75 BCE–200 CE • Rome</div>
+  </div>
+
+  <div class="card source teal" data-lang="Phoenician">
+    <div class="native big">𐤀𐤁𐤂</div>
+    <div class="english">Phoenician</div>
+    <div class="meta">Phoenician Alphabet</div>
+    <div class="meta">1050–150 BCE • Levant</div>
+  </div>
+
+  <div class="card source magenta" data-lang="Aramaic">
+    <div class="native big">ܐܪܡܝܐ</div>
+    <div class="english">Aramaic</div>
+    <div class="meta">Aramaic Script</div>
+    <div class="meta">900 BCE–Present • Near East</div>
+  </div>
+</div>
+
+<h2 class="section-title">✨ Select Language to translate into</h2>
+
+<div class="grid">
+  <div class="card target brown" data-lang="Arabic">
+    <div class="native big">عربي</div>
+    <div class="english">Arabic</div>
+  </div>
+
+  <div class="card target green" data-lang="English">
+    <div class="native big">English</div>
+    <div class="english">Hello</div>
+  </div>
+
+  <div class="card target gold" data-lang="Spanish">
+    <div class="native big">Español</div>
+    <div class="english">Spanish</div>
+  </div>
+
+  <div class="card target red" data-lang="French">
+    <div class="native big">Français</div>
+    <div class="english">French</div>
+  </div>
+</div>
+<!-- TRANSLATOR -->
+<h2 class="section-title">🧠 Translator</h2>
+
+<div class="translator-box">
+
+  <div class="translator-header">
+    <!-- From Language Card -->
+    <div id="fromCard" class="translator-card">
+      <div class="native big">—</div>
+      <div class="english">From</div>
+    </div>
+
+    <span class="arrow">➡️</span>
+
+    <!-- To Language Card -->
+    <div id="toCard" class="translator-card">
+      <div class="native big">—</div>
+      <div class="english">To</div>
+    </div>
+  <button id="cancelUpload" class="upload" style="display:none;">❌ Cancel</button>
+
+  </div>
+
+  <textarea id="inputText" placeholder="Enter text to decode..."></textarea>
+
+  <button id="translateBtn" class="translate-btn">
+    ✨ Decode & Translate
+  </button>
+
+  <div class="translator-output">
+  <div id="translationCard" class="output-card">
+    <strong>Translation:</strong>
+    <p id="translationText">—</p>
+  </div>
+
+  <div id="explanationCard" class="output-card">
+    <strong>Explanation:</strong>
+    <p id="explanationText">—</p>
+  </div>
+</div>
+
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  ⚠️ This translation tool is not 100% accurate. Use for educational purposes only.
+</footer>
+
+</div>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
