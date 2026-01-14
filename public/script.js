@@ -77,16 +77,6 @@ const LANG_DATA = {
 };
 
 // ------------------------------
-// NO MEANING TEXT PER LANGUAGE
-// ------------------------------
-const NO_MEANING_TEXT = {
-  English: "No clear meaning",
-  Spanish: "Sin significado claro",
-  French: "Sans signification claire",
-  Arabic: "لا معنى واضح"
-};
-
-// ------------------------------
 // VARIABLES
 // ------------------------------
 let testerLanguage = "";
@@ -103,14 +93,10 @@ const explanationCard = document.getElementById("explanationText");
 // UPDATE HEADER
 // ------------------------------
 const updateHeader = () => {
-  if (testerLanguage) {
-    const data = LANG_DATA[testerLanguage];
-    fromCard.querySelector(".native.big").textContent = data ? data.examples[0] || "—" : "—";
+  if(testerLanguage){
     fromCard.querySelector(".english").textContent = testerLanguage;
   }
-  if (translationLanguage) {
-    const data = LANG_DATA[translationLanguage];
-    toCard.querySelector(".native.big").textContent = data ? data.examples[0] || "—" : "—";
+  if(translationLanguage){
     toCard.querySelector(".english").textContent = translationLanguage;
   }
 };
@@ -131,24 +117,6 @@ document.querySelectorAll(".card.source").forEach(card => {
     clearSelection(".card.source");
     card.classList.add("selected");
     updateHeader();
-
-    const data = LANG_DATA[testerLanguage];
-    if (!data) return;
-
-    document.getElementById("infoTitle").innerText = testerLanguage;
-    document.getElementById("infoScript").innerText = data.script;
-    document.getElementById("infoChars").innerText = data.chars;
-    document.getElementById("infoHistory").innerText = data.history;
-
-    const ul = document.getElementById("infoExamples");
-    ul.innerHTML = "";
-    data.examples.forEach(e => {
-      const li = document.createElement("li");
-      li.textContent = e;
-      ul.appendChild(li);
-    });
-
-    infoBtn.innerText = testerLanguage + " Reference";
   });
 });
 
@@ -178,18 +146,17 @@ infoBtn.addEventListener("click", () => {
 document.getElementById("translateBtn").addEventListener("click", async () => {
   const input = document.getElementById("inputText").value.trim();
 
-  if (!input || !testerLanguage || !translationLanguage) {
+  if(!input || !testerLanguage || !translationLanguage){
     translationCard.textContent = "Select both languages and enter text.";
     explanationCard.textContent = "";
     return;
   }
 
-  // Show loading
   translationCard.textContent = "Translating...";
   explanationCard.textContent = "Translating...";
 
-  try {
-    const res = await fetch("/translate", {
+  try{
+    const response = await fetch("http://localhost:3000/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -199,18 +166,16 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
       })
     });
 
-    const data = await res.json();
-    const result = data.result || NO_MEANING_TEXT[translationLanguage] || "No clear meaning";
+    const resData = await response.json();
+    const result = resData.result || "No clear meaning";
 
-    // Split first line = translation, rest = explanation
     const lines = result.split("\n").filter(l => l.trim());
-    translationCard.textContent = lines[0] || NO_MEANING_TEXT[translationLanguage];
-    explanationCard.textContent = lines.slice(1).join("\n") || NO_MEANING_TEXT[translationLanguage];
+    translationCard.textContent = lines[0] || "No clear meaning";
+    explanationCard.textContent = lines.slice(1).join("\n") || "No clear meaning";
 
-  } catch (err) {
+  }catch(err){
     console.error(err);
     translationCard.textContent = "Translation failed.";
     explanationCard.textContent = "";
   }
 });
-
