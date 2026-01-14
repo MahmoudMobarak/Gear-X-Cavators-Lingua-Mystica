@@ -1,6 +1,8 @@
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
@@ -8,17 +10,14 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// Allow frontend access
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// Fix for __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Translate endpoint
+// Serve frontend files
+app.use(express.static(path.join(__dirname, "public")));
+
+// API endpoint
 app.post("/translate", async (req, res) => {
   const { input, fromLang, toLang } = req.body;
 
@@ -49,15 +48,18 @@ app.post("/translate", async (req, res) => {
     });
 
     const resultData = await response.json();
-
     const translationText = resultData.choices?.[0]?.message?.content || "No clear meaning";
-
     res.json({ result: translationText });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Translation failed" });
   }
+});
+
+// Default route to serve HTML
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 app.listen(PORT, () => {
