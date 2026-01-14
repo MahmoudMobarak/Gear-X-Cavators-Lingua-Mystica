@@ -108,6 +108,7 @@ const infoBtn = document.getElementById("infoBtn");
 const fromCard = document.getElementById("fromCard");
 const toCard = document.getElementById("toCard");
 const translationCard = document.getElementById("translationText");
+const explanationCard = document.getElementById("explanationText");
 
 // ------------------------------
 // UPDATE HEADER
@@ -196,7 +197,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
 
   // Show loading
   translationCard.textContent = "Translating...";
-  explanationCard.textContent = "Explaining...";
+  explanationCard.textContent = "Translating...";
 
   try {
     // Call backend now
@@ -214,8 +215,9 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     const result = data.result || "No clear meaning";
 
     // Split into translation + explanation
-    translationCard.textContent = result.trim() || "No clear meaning";
-
+    const lines = result.split("\n").filter(l => l.trim());
+    translationCard.textContent = lines[0] || "No clear meaning";
+    explanationCard.textContent = lines.slice(1).join("\n") || "No clear meaning";
 
   } catch (err) {
     console.error(err);
