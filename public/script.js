@@ -82,62 +82,32 @@ const LANG_DATA = {
 let testerLanguage = "";
 let translationLanguage = "";
 
-const infoPanel = document.getElementById("infoPanel");
-const infoBtn = document.getElementById("infoBtn");
 const fromCard = document.getElementById("fromCard");
 const toCard = document.getElementById("toCard");
 const translationCard = document.getElementById("translationText");
 const explanationCard = document.getElementById("explanationText");
 
 // ------------------------------
-// UPDATE HEADER
-// ------------------------------
-const updateHeader = () => {
-  if(testerLanguage){
-    fromCard.querySelector(".english").textContent = testerLanguage;
-  }
-  if(translationLanguage){
-    toCard.querySelector(".english").textContent = translationLanguage;
-  }
-};
-
-// ------------------------------
-// CLEAR CARD SELECTION
-// ------------------------------
-const clearSelection = (selector) => {
-  document.querySelectorAll(selector).forEach(c => c.classList.remove("selected"));
-};
-
-// ------------------------------
-// SOURCE LANGUAGE
+// SELECT LANGUAGES
 // ------------------------------
 document.querySelectorAll(".card.source").forEach(card => {
   card.addEventListener("click", () => {
     testerLanguage = card.dataset.lang;
-    clearSelection(".card.source");
+    document.querySelectorAll(".card.source").forEach(c => c.classList.remove("selected"));
     card.classList.add("selected");
-    updateHeader();
+    fromCard.querySelector(".native.big").textContent = card.querySelector(".native.big").textContent;
+    fromCard.querySelector(".english").textContent = testerLanguage;
   });
 });
 
-// ------------------------------
-// TARGET LANGUAGE
-// ------------------------------
 document.querySelectorAll(".card.target").forEach(card => {
   card.addEventListener("click", () => {
     translationLanguage = card.dataset.lang;
-    clearSelection(".card.target");
+    document.querySelectorAll(".card.target").forEach(c => c.classList.remove("selected"));
     card.classList.add("selected");
-    updateHeader();
+    toCard.querySelector(".native.big").textContent = card.querySelector(".native.big").textContent;
+    toCard.querySelector(".english").textContent = translationLanguage;
   });
-});
-
-// ------------------------------
-// INFO BUTTON TOGGLE
-// ------------------------------
-infoBtn.addEventListener("click", () => {
-  infoPanel.classList.toggle("hidden");
-  infoPanel.classList.toggle("show");
 });
 
 // ------------------------------
@@ -146,7 +116,7 @@ infoBtn.addEventListener("click", () => {
 document.getElementById("translateBtn").addEventListener("click", async () => {
   const input = document.getElementById("inputText").value.trim();
 
-  if(!input || !testerLanguage || !translationLanguage){
+  if (!input || !testerLanguage || !translationLanguage) {
     translationCard.textContent = "Select both languages and enter text.";
     explanationCard.textContent = "";
     return;
@@ -155,8 +125,8 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
   translationCard.textContent = "Translating...";
   explanationCard.textContent = "Translating...";
 
-  try{
-    const response = await fetch("http://localhost:3000/translate", {
+  try {
+    const res = await fetch("/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -166,14 +136,19 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
       })
     });
 
-    const resData = await response.json();
-    const result = resData.result || "No clear meaning";
+    const data = await res.json();
 
-    const lines = result.split("\n").filter(l => l.trim());
-    translationCard.textContent = lines[0] || "No clear meaning";
-    explanationCard.textContent = lines.slice(1).join("\n") || "No clear meaning";
+    if (data.error) {
+      translationCard.textContent = "Translation failed.";
+      explanationCard.textContent = "";
+      return;
+    }
 
-  }catch(err){
+    const lines = data.result.split("\n").filter(l => l.trim());
+    translationCard.textContent = lines[0];
+    explanationCard.textContent = lines.slice(1).join("\n") || "No explanation available.";
+
+  } catch (err) {
     console.error(err);
     translationCard.textContent = "Translation failed.";
     explanationCard.textContent = "";
