@@ -49,7 +49,10 @@ app.post("/translate", async (req, res) => {
           messages: [
             {
               role: "system",
-              content:  'You are an expert ancient linguist. 1. Detect the source language. 2. Translate from that language into ${toLang}. 3. Give a short explanation.FORMAT STRICTLY: Language: <language name> Translation: <translation>Explanation: <explanation> If no meaning exists, say: Language: Unknown Translation: No clear meaning Explanation: No clear meaning'
+              content: `Translate from ${fromLang} to ${toLang}.
+Return ONLY the translation on the first line.
+Then return a short explanation on the second line.
+If no meaning exists, say "No clear meaning".`
             },
             {
               role: "user",
