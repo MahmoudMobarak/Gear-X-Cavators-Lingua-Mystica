@@ -109,9 +109,6 @@ const fromCard = document.getElementById("fromCard");
 const toCard = document.getElementById("toCard");
 const translationCard = document.getElementById("translationText");
 const explanationCard = document.getElementById("explanationText");
-const detectedLangBox = document.getElementById("detectedLangBox");
-const detectedLangText = document.getElementById("detectedLang");
-
 
 // ------------------------------
 // UPDATE HEADER
@@ -202,49 +199,38 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
   translationCard.textContent = "Translating...";
   explanationCard.textContent = "Translating...";
 
+  const noMeaning = NO_MEANING_TEXT[translationLanguage] || "No clear meaning";
+
   try {
-    // Call backend now
-    const res = await fetch("/translate", {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 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"
+      },
       body: JSON.stringify({
-        input: input,
-        fromLang: testerLanguage,
-        toLang: translationLanguage
+        model: "deepseek/deepseek-r1-0528:free",
+        messages: [
+          {
+            role: "system",
+            content: `Translate from ${testerLanguage} to ${translationLanguage}.
+                      Give ONLY the plain translation in the first line.
+                      Then give a clear explanation in plain text.
+                      Do NOT include markdown or special formatting.
+                      If the word does not exist, say '${noMeaning}'.`
+          },
+          { role: "user", content: input }
+        ]
       })
     });
 
     const data = await res.json();
-    const result = data.result || "No clear meaning";
+    const result = data.choices[0].message.content;
 
     // Split into translation + explanation
-    const langMatch = result.match(/Language:\s*(.*)/i);
-    const translationMatch = result.match(/Translation:\s*(.*)/i);
-    const explanationMatch = result.match(/Explanation:\s*(.*)/i);
-    
-    const detectedLang = langMatch ? langMatch[1] : "Unknown";
-    const translation = translationMatch ? translationMatch[1] : "No clear meaning";
-    const explanation = explanationMatch ? explanationMatch[1] : "No clear meaning";
-
-    document.getElementById("inputText").value = text.trim();
-    detectedLangBox.classList.add("hidden"); // reset until translate
-
-    
-    // Show detected language
     const lines = result.split("\n").filter(l => l.trim());
-    
-    translationText.textContent = lines[0] || "No clear meaning";
-    explanationText.textContent = lines.slice(1).join("\n") || "";
-    
-    // 👇 ADD THIS
-    detectedLangBox.classList.remove("hidden");
-    detectedLangText.textContent = testerLanguage;
-
-    
-    // Show results
-    translationCard.textContent = translation;
-    explanationCard.textContent = explanation;
-
+    translationCard.textContent = lines[0] || noMeaning;
+    explanationCard.textContent = lines.slice(1).join("\n") || noMeaning;
 
   } catch (err) {
     console.error(err);
@@ -252,11 +238,3 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
-
-
-
-
-
-
-
-
