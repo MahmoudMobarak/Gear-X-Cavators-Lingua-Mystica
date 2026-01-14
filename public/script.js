@@ -231,8 +231,15 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
 
     
     // Show detected language
-    detectedLangText.textContent = detectedLang;
+    const lines = result.split("\n").filter(l => l.trim());
+    
+    translationText.textContent = lines[0] || "No clear meaning";
+    explanationText.textContent = lines.slice(1).join("\n") || "";
+    
+    // 👇 ADD THIS
     detectedLangBox.classList.remove("hidden");
+    detectedLangText.textContent = testerLanguage;
+
     
     // Show results
     translationCard.textContent = translation;
@@ -245,6 +252,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
 
 
