@@ -33,35 +33,33 @@ app.post("/translate", async (req, res) => {
   }
 
   try {
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": 'Bearer ${process.env.OPENROUTER_API_KEY}'
+  },
+  body: JSON.stringify({
+    model: "deepseek/deepseek-r1-0528:free",
+    messages: [
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          // REQUIRED by OpenRouter (this was missing before)
-          "HTTP-Referer": "https://gear-x-cavators-lingua-mystica.onrender.com",
-          "X-Title": "Lingua Mystica"
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-r1-0528:free",
-          messages: [
-            {
-              role: "system",
-              content: `Translate from ${fromLang} to ${toLang}.
-Return ONLY the translation on the first line.
-Then return a short explanation on the second line.
-If no meaning exists, say "No clear meaning".`
-            },
-            {
-              role: "user",
-              content: input
-            }
-          ]
-        })
-      }
-    );
+        role: "system",
+        content: `Translate from ${testerLanguage} to ${translationLanguage}. 
+                  Give ONLY the plain translation in the first line. 
+                  Then give a clear explanation in plain text. 
+                  Do NOT include markdown or special formatting.`
+      },
+      { role: "user", content: input }
+    ]
+  })
+});
+
+    const data = await res.json();
+    const result = data.choices[0].message.content;
+    
+    const lines = result.split("\n").filter(l => l.trim());
+    translationCard.textContent = lines[0] || NO_MEANING_TEXT[translationLanguage];
+    explanationCard.textContent = lines.slice(1).join("\n") || NO_MEANING_TEXT[translationLanguage];
 
     const data = await response.json();
 
