@@ -218,9 +218,22 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     const result = data.result || "No clear meaning";
 
     // Split into translation + explanation
-    const lines = result.split("\n").filter(l => l.trim());
-    translationCard.textContent = lines[0] || "No clear meaning";
-    explanationCard.textContent = lines.slice(1).join("\n") || "No clear meaning";
+    const langMatch = result.match(/Language:\s*(.*)/i);
+    const translationMatch = result.match(/Translation:\s*(.*)/i);
+    const explanationMatch = result.match(/Explanation:\s*(.*)/i);
+    
+    const detectedLang = langMatch ? langMatch[1] : "Unknown";
+    const translation = translationMatch ? translationMatch[1] : "No clear meaning";
+    const explanation = explanationMatch ? explanationMatch[1] : "No clear meaning";
+    
+    // Show detected language
+    detectedLangText.textContent = detectedLang;
+    detectedLangBox.classList.remove("hidden");
+    
+    // Show results
+    translationCard.textContent = translation;
+    explanationCard.textContent = explanation;
+
 
   } catch (err) {
     console.error(err);
@@ -228,6 +241,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
 
 
