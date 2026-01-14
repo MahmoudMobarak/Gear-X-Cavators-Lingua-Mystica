@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Needed for ES modules
+// Required for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,12 +17,14 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Health check (IMPORTANT)
+// Health check (Render needs this)
 app.get("/health", (req, res) => {
-  res.send("OK");
+  res.status(200).send("OK");
 });
 
+// ===============================
 // TRANSLATE ENDPOINT
+// ===============================
 app.post("/translate", async (req, res) => {
   const { input, fromLang, toLang } = req.body;
 
@@ -37,7 +39,10 @@ app.post("/translate", async (req, res) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          // REQUIRED by OpenRouter (this was missing before)
+          "HTTP-Referer": "https://gear-x-cavators-lingua-mystica.onrender.com",
+          "X-Title": "Lingua Mystica"
         },
         body: JSON.stringify({
           model: "deepseek/deepseek-r1-0528:free",
@@ -45,11 +50,14 @@ app.post("/translate", async (req, res) => {
             {
               role: "system",
               content: `Translate from ${fromLang} to ${toLang}.
-Return ONLY the translation on line 1.
-Then a short explanation on line 2.
+Return ONLY the translation on the first line.
+Then return a short explanation on the second line.
 If no meaning exists, say "No clear meaning".`
             },
-            { role: "user", content: input }
+            {
+              role: "user",
+              content: input
+            }
           ]
         })
       }
@@ -57,10 +65,19 @@ If no meaning exists, say "No clear meaning".`
 
     const data = await response.json();
 
-    console.log("OPENROUTER RAW RESPONSE:", JSON.stringify(data, null, 2));
+    // VERY IMPORTANT LOG
+    console.log(
+      "OPENROUTER RAW RESPONSE:",
+      JSON.stringify(data, null, 2)
+    );
+
+    if (data.error) {
+      console.error("OPENROUTER ERROR:", data.error);
+      return res.json({ result: "No clear meaning" });
+    }
 
     const text =
-      data?.choices?.[0]?.message?.content || "No clear meaning";
+      data?.choices?.[0]?.message?.content ?? "No clear meaning";
 
     res.json({ result: text });
 
@@ -70,7 +87,7 @@ If no meaning exists, say "No clear meaning".`
   }
 });
 
-// Serve index.html
+// Serve frontend (for GitHub Pages-style routing)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
