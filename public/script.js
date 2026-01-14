@@ -109,6 +109,9 @@ const fromCard = document.getElementById("fromCard");
 const toCard = document.getElementById("toCard");
 const translationCard = document.getElementById("translationText");
 const explanationCard = document.getElementById("explanationText");
+const detectedLangBox = document.getElementById("detectedLangBox");
+const detectedLangText = document.getElementById("detectedLang");
+
 
 // ------------------------------
 // UPDATE HEADER
@@ -225,6 +228,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
 
 
