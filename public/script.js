@@ -98,8 +98,6 @@ const fromCard = document.getElementById("fromCard");
 const toCard = document.getElementById("toCard");
 const translationCard = document.getElementById("translationText");
 const explanationCard = document.getElementById("explanationText");
-const detectedLangBox = document.getElementById("detectedLangBox");
-const detectedLang = document.getElementById("detectedLang");
 
 // ------------------------------
 // UPDATE HEADER
@@ -183,14 +181,12 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
   if (!input || !testerLanguage || !translationLanguage) {
     translationCard.textContent = "Select both languages and enter text.";
     explanationCard.textContent = "";
-    detectedLangBox.classList.add("hidden");
     return;
   }
 
   // Show loading
   translationCard.textContent = "Translating...";
   explanationCard.textContent = "Translating...";
-  detectedLangBox.classList.add("hidden");
 
   try {
     const res = await fetch("/translate", {
@@ -210,11 +206,6 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     const lines = result.split("\n").filter(l => l.trim());
     translationCard.textContent = lines[0] || NO_MEANING_TEXT[translationLanguage];
     explanationCard.textContent = lines.slice(1).join("\n") || NO_MEANING_TEXT[translationLanguage];
-
-    // Show detected language box
-    detectedLang.textContent = testerLanguage;
-    detectedLangBox.classList.remove("hidden");
-
   } catch (err) {
     console.error(err);
     translationCard.textContent = "Translation failed.";
@@ -222,3 +213,4 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     detectedLangBox.classList.add("hidden");
   }
 });
+
