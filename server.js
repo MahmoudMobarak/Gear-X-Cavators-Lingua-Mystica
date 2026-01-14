@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Needed for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,6 +16,11 @@ const __dirname = path.dirname(__filename);
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+// Health check (IMPORTANT)
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
 
 // TRANSLATE ENDPOINT
 app.post("/translate", async (req, res) => {
@@ -26,39 +31,51 @@ app.post("/translate", async (req, res) => {
   }
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528:free",
-        messages: [
-          {
-            role: "system",
-            content: `Translate from ${fromLang} to ${toLang}.
-Give ONLY the plain translation in the first line.
-Then give a clear explanation in plain text.
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-r1-0528:free",
+          messages: [
+            {
+              role: "system",
+              content: `Translate from ${fromLang} to ${toLang}.
+Return ONLY the translation on line 1.
+Then a short explanation on line 2.
 If no meaning exists, say "No clear meaning".`
-          },
-          { role: "user", content: input }
-        ]
-      })
-    });
+            },
+            { role: "user", content: input }
+          ]
+        })
+      }
+    );
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || "No clear meaning";
+
+    console.log("OPENROUTER RAW RESPONSE:", JSON.stringify(data, null, 2));
+
+    const text =
+      data?.choices?.[0]?.message?.content || "No clear meaning";
 
     res.json({ result: text });
 
   } catch (err) {
-    console.error(err);
+    console.error("TRANSLATION ERROR:", err);
     res.json({ result: "No clear meaning" });
   }
 });
 
-// START SERVER
+// Serve index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Start server
 app.listen(PORT, () => {
   console.log(`Lingua Mystica running on port ${PORT}`);
 });
