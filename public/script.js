@@ -225,6 +225,10 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     const detectedLang = langMatch ? langMatch[1] : "Unknown";
     const translation = translationMatch ? translationMatch[1] : "No clear meaning";
     const explanation = explanationMatch ? explanationMatch[1] : "No clear meaning";
+
+    document.getElementById("inputText").value = text.trim();
+    detectedLangBox.classList.add("hidden"); // reset until translate
+
     
     // Show detected language
     detectedLangText.textContent = detectedLang;
@@ -241,6 +245,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
 
 
