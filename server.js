@@ -47,8 +47,13 @@ app.post("/translate", async (req, res) => {
       })
     });
 
-    const resultData = await response.json();
-    const translationText = resultData.choices?.[0]?.message?.content || "No clear meaning";
+    if (!response.ok) {
+      throw new Error(`OpenRouter API failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const translationText = data.choices?.[0]?.message?.content || "No clear meaning";
+
     res.json({ result: translationText });
 
   } catch (err) {
@@ -57,7 +62,7 @@ app.post("/translate", async (req, res) => {
   }
 });
 
-// Default route to serve HTML
+// Serve HTML
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
