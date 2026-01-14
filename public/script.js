@@ -200,7 +200,7 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
   explanationCard.textContent = "Translating...";
 
   try {
-    // Call your backend now
+    // Call backend now
     const res = await fetch("/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -225,5 +225,6 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     explanationCard.textContent = "";
   }
 });
+
 
 
